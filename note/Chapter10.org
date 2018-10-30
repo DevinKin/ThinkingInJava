@@ -1,5 +1,5 @@
 #+TITLE: Java编程思想学习笔记-第十章
-#+CATEGORIES: Java
+#+CATEGORIES: Java interview
 #+DESCRIPTION: ThinkingInJava学习笔记
 #+KEYWORDS: Java
 #+DATE: 2018-10-30 22:50
