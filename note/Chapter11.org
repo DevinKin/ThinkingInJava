@@ -185,5 +185,4 @@ Bob -> Alice: 状态返回
 Alice -> Alice: 给自己发消息
 #+END_SRC
 
-#+RESULTS:
 [[file:./img/uml.png]]
