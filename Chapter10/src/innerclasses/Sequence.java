@@ -1,6 +1,8 @@
 package innerclasses;
 
 
+import java.util.Arrays;
+
 interface Selector {
     boolean end();
     Object current();
@@ -10,14 +12,25 @@ interface Selector {
 public class Sequence {
     private Object[] items;
     private int next = 0;
+    private int size = 10;
     public Sequence(int size) {
+        this.size = size;
         items = new Object[size];
     }
 
     public void add(Object x) {
         if (next < items.length) {
             items[next++] = x;
+        } else {
+            grow();
+            items[next++] = x;
         }
+    }
+
+    private void grow() {
+        size = items.length;
+        int newsize = size + (size >> 2);
+        items = Arrays.copyOf(items, newsize);
     }
 
     private class SequenceSelector implements Selector {

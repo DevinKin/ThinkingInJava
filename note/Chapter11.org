@@ -1,0 +1,189 @@
+* 第十一章-持有对象
+
+** 基本概念
+Java容器类类库的用途是"保存对象",并将其划分为两个不同的概念
+
+1. Collection: 一个独立的元素序列,这些元素都服从一条或多条规则.
+2. Map: 一组成对的"键值对"对象,允许你使用键来查找值.
+
+
+** List
+1. 基本的ArrayList,它长于随机访问元素,但是在List的中间插入和溢出元素时候比较慢
+2. LinkedList,它通过代价较低的在LIst中间进行的插入和删除操作,提供了优化的顺序访问.LinkedList在随机访问方面相对较慢,但是它的特性集较ArrayList更大.
+3. subList()方法允许你很容易地从较大的列表中创建出一个片段.
+4. retainAll()方法是一宗有效的"交集"操作,所产生的行为依赖于equals().
+5. removeAll()方法的行为也是基于equals()方法的.
+
+
+** 迭代器
+1. 迭代器是一个轻量级的对象(创建它的代价小),它的工作是遍历并选择序列中的对象,而客户端程序员不必知道或关心序列底层的结构.
+2. Iterator只能单向移动,这个Iterator只能用来
+   - 使用方法iterator()要求容器返回一个Iterator.Iterator将准备好返回序列的第一个元素.
+   - 使用next()获得序列中的下一个元素.
+   - 使用hasNext()检查序列中是否还有元素.
+   - 使用reemove()将迭代器当前返回的元素删除
+
+*** ListIterator
+1. ListIterator是一个更加强大的Iterator子类型.
+2. ListIterator可以双向移动.
+3. ListIterator可以产生相对于迭代器在列表中指定当前位置的前一个和后一个元素的索引.
+4. ListIterator可以使用set()方法替换它访问过的最后一个元素.
+5. 可以使用listIterator()方法产生一个指向List开始处的ListIterator,并且还可以通过调用listIterator(n)方法创建一个一开始就只想列表索引为n的元素处的ListIterator.
+   
+
+
+
+** LinkedList
+1. LinkedList同样实现了List接口,在中间插入和删除元素时候比ArrayList更高效.
+2. LinkList随机访问操作比ArrayList性能要逊色.
+3. LinkedList还添加了可以试用期作为栈,队列或双端队列的方法.
+4. getFirst()和element()完全一样,它们都返回列表的头元素,而不移除它.List为空,抛出NoSuchElement-Exception异常.
+5. peek()方法在列表为空时候返回null,其余行为与getFirst()和element()方法一致.
+6. removeFirst()和remove()完全一样,它们移除并返回列表的头,而列表为空时,抛出NoSuchElement-Exception异常.
+7. poll()方法在列表为空时候返回null,其余行为与removeFirst()和remove()方法一致.
+8. add()方法addLast()和offer()方法都是添加一个元素到列表尾部.
+
+
+** Stack
+1. 栈通常是指"后进先出"(LIFO)的容器.
+2. Stack使用LinkedList实现的方式可能更好.
+
+   
+** Set
+1. Set不保存重复的元素.
+2. Set具有与Collection完全一样的接口,因此没有额外的功能.
+3. HashSet使用了散列
+4. TreeSet将元素存储在红-黑树数据结构中
+
+   
+** Map
+1. keySet()方法返回Map的键的Set
+2. values()方法返回Map的值的Collection
+
+   
+** Queue
+1. 队列是一个典型的先进先出(FIFO)的容器.
+2. LinkedList提供方法以支持队列的行为,并且它实现了Queue接口.
+3. offer()方法是将一个元素插入到队尾,或者返回false.
+4. peek()和element()都将在不移除的情况下返回队头,但peek()方法在队列为空时返回null,element()会抛出NoSuchElementException异常.
+5. poll()和remove()都将移除并返回队头,但poll()方法在队列为空时返回null,remove()会抛出NoSuchElementException异常.
+   
+** PriorityQueue
+1. 优先级队列声明下一个弹出元素是最需要的元素(具有最高的优先级)
+2. PriorityQueue上调用offer()方法来插入一个对象时,这个对象会在队列中被排序.
+3. 默认的排序使用对象在队列中的自然排序,但是可以提供自己的Comparator来修改这个顺序.
+4. PriorityQueue可以确保当你调用peek(),poll(),remove()方法时,获取的元素是队列中优先级最高的元素.
+
+   
+** Collection和Iterator
+1. Collection是描述所有序列容器的共性的根接口,AbstractCollection提供了Collection的默认实现.
+
+2. Iterator接口的方法比Collection接口的方法要少,所以在实现Collection接口时会十分麻烦,所以Iterator接口更方便.
+
+3. 生成Iterator是将队列与消费队列的方法连接在一起耦合度最小的方式,并且与实现Collection相比,它在序列类上所事假的约束也少得多.
+
+
+** Foreach与迭代器
+1. Collection之所以能使用foreach语法遍历,是因为它实现了Iterable的接口,该接口包含一个能够产生Iterator的iterator()方法,并且Iterable接口被foreach用来在序列中移动.
+2. foreach语句可以用于数组或其他任何Iterable,但是这并不意味着数组肯定也是一个Iterable,而任何自动包装也不会自动发生.
+
+
+** 适配器方法惯用法
+1. 场景:你想要添加一种或多种在foreach语句中使用Iterable类的方法,应该怎么做?
+   - 直接继承这个类,实现iterator()方法.
+   - 问题:只能替换现有的方法,不能实现选择.
+2. 解决方案:添加一个产生Iterable的方法reversed.这是编写一个适配器的思想,从而不会覆盖原有的iterator()方法.
+#+BEGIN_SRC java
+package holding;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+
+class ReversibleArrayList<T> extends ArrayList<T> {
+    public ReversibleArrayList(Collection c) {
+        super(c);
+    }
+
+    public Iterable<T> reversed() {
+        return new Iterable<T>() {
+            @Override
+            public Iterator<T> iterator() {
+                return new Iterator<T>() {
+                    int current = size() - 1;
+                    @Override
+                    public boolean hasNext() {
+                        return current > -1;
+                    }
+
+                    @Override
+                    public T next() {
+                        return get(current--);
+                    }
+
+                    @Override
+                    public void remove() {
+                        // Not implemented
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+}
+
+public class AdapterMethodIdiom {
+    public static void main(String[] args) {
+        ReversibleArrayList<String> ral = new ReversibleArrayList<>(
+                Arrays.asList("To be or not to be".split(" ")));
+        // Grabs the ordinary iterator via iterator():
+        for (String s : ral) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+        // Hand it the Iterable of your choice
+        for (String s : ral.reversed()) {
+            System.out.print(s + " ");
+        }
+    }
+}
+
+#+END_SRC
+
+** 总结
+1. 如果要进行大量的随机访问,就是用ArrayList,如果要经常从表中间插入或删除元素,则应该使用LinkedList.
+2. 各种Queue及栈的行为,由LinkedList提供支持.
+3. HashMap设计用来快速访问.TreeMap保持"键"始终处在排序状态,所以没有HashMap快.LinkedHashMap保持元素插入的顺序,但是也通过散列提供了快速访问能力.
+4. Set不接受重复元素.HashSet提供最快的查询速度.TreeSet保持元素处在排序状态.LinkedHashSet以插入顺序保存元素.
+5. 新程序中不应该使用过时的Vector,HashTable和Stack.
+
+   
+#+BEGIN_SRC plantuml :file ./img/uml.png :exports none :result silent
+title 时序图
+
+== 鉴权阶段 ==
+
+Alice -> Bob: 请求
+Bob -> Alice: 应答
+
+== 数据上传 ==
+
+Alice -> Bob: 上传数据
+note left: 这是显示在左边的备注
+
+Bob --> Canny: 转交数据
+... 不超过 5 秒钟 ...
+Canny --> Bob: 状态返回
+note right: 这是显示在右边的备注
+
+Bob -> Alice: 状态返回
+
+== 状态显示 ==
+
+Alice -> Alice: 给自己发消息
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/uml.png]]
