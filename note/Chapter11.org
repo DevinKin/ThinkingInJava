@@ -1,3 +1,9 @@
+#+TITLE: Java编程思想学习笔记-第11章
+#+CATEGORIES: JavaNote
+#+DESCRIPTION: ThinkingInJava学习笔记
+#+KEYWORDS: Java
+#+DATE: 2018-10-31 20:56
+
 * 第十一章-持有对象
 
 ** 基本概念
@@ -158,31 +164,63 @@ public class AdapterMethodIdiom {
 3. HashMap设计用来快速访问.TreeMap保持"键"始终处在排序状态,所以没有HashMap快.LinkedHashMap保持元素插入的顺序,但是也通过散列提供了快速访问能力.
 4. Set不接受重复元素.HashSet提供最快的查询速度.TreeSet保持元素处在排序状态.LinkedHashSet以插入顺序保存元素.
 5. 新程序中不应该使用过时的Vector,HashTable和Stack.
-
-   
+6. Java容器简图   
 #+BEGIN_SRC plantuml :file ./img/uml.png :exports none :result silent
-title 时序图
+title 简单容器分类
+  
+@startuml
+interface Iterator
+interface Collection
+interface Map
+interface List
+interface Set
+interface Queue
+interface ListIterator
+interface Comparable
+interface Comparator
 
-== 鉴权阶段 ==
+Iterator <.. Collection :Produces
+Iterator <|.. ListIterator
 
-Alice -> Bob: 请求
-Bob -> Alice: 应答
+ListIterator <.. List :Produces
 
-== 数据上传 ==
+Collection <.. Map :Produces
+Collection <|.. List
+Collection <|.. Set
+Collection <|.. Queue
 
-Alice -> Bob: 上传数据
-note left: 这是显示在左边的备注
+HashMap - TreeMap
+Map <|.. HashMap 
+Map <|.. TreeMap
 
-Bob --> Canny: 转交数据
-... 不超过 5 秒钟 ...
-Canny --> Bob: 状态返回
-note right: 这是显示在右边的备注
+List <.. ArrayList
+List <.. LinkedList
 
-Bob -> Alice: 状态返回
+Set <.. HashSet
+Set <.. TreeSet
 
-== 状态显示 ==
+Queue <.. LinkedList
+Queue <.. PriorityQueue
 
-Alice -> Alice: 给自己发消息
+HashMap <|-- LinkedHashMap
+
+HashSet <|-- LinkedHashSet
+
+Comparable <--> Comparator
+@enduml
 #+END_SRC
 
+#+RESULTS:
 [[file:./img/uml.png]]
+
+#+BEGIN_SRC plantuml :file ./img/uml2.png :exports none :result silent
+@startuml
+rectangle Utilities {
+rectangle Collections
+rectangle Arrays
+}
+@enduml
+#+END_SRC
+#+RESULTS:
+[[file:./img/uml2.png]]
+
