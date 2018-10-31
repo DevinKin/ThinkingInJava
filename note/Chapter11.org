@@ -165,7 +165,7 @@ public class AdapterMethodIdiom {
 4. Set不接受重复元素.HashSet提供最快的查询速度.TreeSet保持元素处在排序状态.LinkedHashSet以插入顺序保存元素.
 5. 新程序中不应该使用过时的Vector,HashTable和Stack.
 6. Java容器简图   
-#+BEGIN_SRC plantuml :file ./img/uml.png :exports none :result silent
+#+BEGIN_SRC plantuml :file ./img/uml1.png :exports none :result silent
 title 简单容器分类
   
 @startuml
@@ -211,7 +211,7 @@ Comparable <--> Comparator
 #+END_SRC
 
 #+RESULTS:
-[[file:./img/uml.png]]
+[[file:./img/uml1.png]]
 
 #+BEGIN_SRC plantuml :file ./img/uml2.png :exports none :result silent
 @startuml
