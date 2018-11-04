@@ -1,0 +1,244 @@
+#+TITLE: Java编程思想学习笔记-第13章
+#+CATEGORIES: JavaNote
+#+DESCRIPTION: ThinkingInJava学习笔记
+#+KEYWORDS: Java
+#+DATE: 2018-11-02 14:05
+* 第13章-字符串
+
+** 不可变String
+1. String对象是不可变的,字符串对象作为方法的参数传递时,实际传递的是引用的一个拷贝.该引用所指的对象其实一直待在单一的物理位置上,从未动过.
+2. 给String对象赋值本质上是改变该String对象引用的指向.
+
+** 重载"+"与StringBuilder
+1. String对象是不可变的,你可以给一个String对象加任意多的别名.因为String对象具有只读特性,所以指向它的任何引用都不可能改变它的值.
+2. 不可变性会带来一定的效率问题,为String对象重载的"+"操作符就是一个例子.
+3. String的"+"操作经过编译器优化后是利用的StringBuilder对字符串进行拼接,性能不如直接使用StringBuilder拼接字符串要好.
+4. 多个String对象的"+"操作有可能会创建多个StringBuilder来拼接.
+
+   
+** 无意识的递归
+1. 想打印对象的内存地址,在toString()方法中不能使用this关键字的返回字符串,this关键字会转换为String对象,从而递归调用toString()方法,会抛出异常.
+2. 解决方案: 使用super.toString()方法打印内存地址.这里的super父类是Object类.
+#+BEGIN_SRC java
+package strings;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class InfiniteRecursion {
+    @Override
+    public String toString() {
+        return " InfiniteRecursion address: " + super.toString() + "\n";
+    }
+
+    public static void main(String[] args) {
+        List<InfiniteRecursion> v = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            v.add(new InfiniteRecursion());
+        }
+        System.out.println(v);
+    }
+}
+#+END_SRC
+
+** String上的操作
+1. 当需要改变字符串的内容时,String类的方法都会返回一个新的String对象.
+2. 同时,如果内容没有发生改变,String的方法只是返回指向原对象的引用而已.这节省了存储空间以及避免了额外的花销.
+| 方法                        | 参数,重载版本                                                                               | 应用                                                                                               |
+|-----------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------|
+| 构造器                      | 重载版本:默认版本,String,StringBuilder,StringBuffer,char数组,byte数组                       | 创建String对象                                                                                     |
+| length()                    |                                                                                             | String中字符的个数                                                                                 |
+| charAt()                    | Int索引                                                                                     | 取得String中该索引位置上的char                                                                     |
+| getChars(),getBytes()       | 要复制的部分的起点和终点的索引,复制的目标数组,目标数组的起始索引                            | 复制char或byte到一个目标数组中                                                                     |
+| toCharArray()               |                                                                                             | 生成一个char[],包含String的所有字符                                                                |
+| equals(),equalsIgnoreCase() | 与之进行比较的String                                                                        | 比较两个String的内容是否相同                                                                       |
+| compareTo                   | 与之进行比较的String                                                                        | 按词典顺序比较String的内容,比较结果为负数,零或正数.注意,大小写并不等价                             |
+| contains                    |                                                                                             |                                                                                                    |
+| contentEquals()             | 与之比较的CharSequence或StringBuffer                                                        | 如果该String与参数的内容完全一致,则返回true                                                        |
+| equalsIgnoreCase            | 与之进行比较的String                                                                        | 忽略大小写,如果两个String的内容相同,则返回true                                                     |
+| regionMatcher()             | 该String的索引偏移量,另一个String及其索引偏移量,要比较的长度.重载版本增加了"忽略大小写"功能 | 返回boolean结果,以表明所比较区域是否相等                                                           |
+| startsWith()                | 可能的起始String.重载版本在参数中增加了偏移量                                               | 返回boolean结果,以表明String是否以此参数起始                                                       |
+| endsWith()                  | 该String可能的后缀String                                                                    | 返回boolean结果,以表明此参数在String中的起始索引.lastIndexOf()是从后向前搜索                       |
+| indexOf(),lastIndexOf()     | 重载版本包括:char,char与起始索引,String,String与起始索引                                    | 如果该String并不包含此参数,就返回-1;否则返回此参数在String中起始的索引.lastIndexOf()是从后向前搜索 |
+| substring(subSequence())    | 重载版本:起始索引;起始索引+终点坐标                                                         | 返回一个新的String,以包含参数指定的子字符串                                                        |
+| concat()                    | 要连接的String                                                                              | 返回一个新的String对象,内容为起始Stirng连接上参数String                                            |
+| replace()                   | 要替换掉的字符,用来进行替换的新字符,也可以用一个CharSequence来转换另一个CharSequence        | 返回替换字符后的新String对象.如果没有替换发生,则返回原始的String对象                               |
+| toLowerCase,toUpperCase()   |                                                                                             | 将字符的大小写改变后,返回一个新String对象.如果没有发生改变,则返回原始的String对象                  |
+| trim()                      |                                                                                             | 将String两端的空白字符删除后,返回一个新的String对象.如果没有改变发生,则返回原始的String对象        |
+| valueOf()                   | 重载版本:Object;char[];char[],偏移量,字符个数; boolean; char; int; long; float; double      | 返回一个表示参数内容的String                                                                       |
+| intern()                    |                                                                                             | 为每个唯一的字符序列生成一个且仅生成一个String引用                                                 |
+
+
+** 格式化输出
+
+** System.out.format()
+- System.out.format()可以用于PrintStream或PrintWriter对象,其中包括System.out对象.
+
+** Formatter类
+- Formatter类可以将格式化字符串与数据翻译成需要的结果.
+
+*** 格式化说明符
+1. Formatter类格式化抽象语法: ~%[argument_index][flags][width][.precision]conversion~
+   - 用"-"标志来改变对齐方向(默认右对齐),添加了"-"表示左对齐
+   - width: 控制一个域的最小尺寸,
+   - precision: 用来指明最大尺寸,用于String时,它表示打印String时输出字符的最大数量.用于浮点数时,表示小数显示的位数(默认6位),小数过多则舍入,过少则在尾部补零.用于整数时,会出发异常.
+
+*** Formatter转换
+1. 常用的类型转换
+| 类型转换字符 | 说明               |
+|--------------+--------------------|
+| d            | 整数型(十进制)     |
+| c            | Unicode字符        |
+| b            | Boolean值          |
+| s            | String             |
+| f            | 浮点数(十进制)     |
+| e            | 浮点数(科学计数法) |
+| x            | 整数(十六进制)     |
+| h            | 散列码(十六进制)   |
+| %            | 字符'%'              |
+
+
+*** String.format()
+- 是一个static方法,接受与Formatter.format()方法一样的参数,但返回一个String对象.
+- String.format()内部,它也是创建一个Formatter对象,然后将你传入的参数转给Formatter.
+
+** 正则表达式
+1. 在Java中使用正则表达式, ~\\~ 的意思是要插入一个正则表达式的反斜线, ~\\\\~ 是插入一个普通的反斜线.
+
+*** 创建正则表达式
+- 字符说明
+
+| 字符   | 说明                              |
+|--------+-----------------------------------|
+| B      | 指定字符B                         |
+| \xhh   | 十六进制值为oxhh的字符            |
+| \uhhhh | 十六进制表示为oxhhhh的Unicode字符 |
+| \t     | 制表符Tab                         |
+| \n     | 换行符                            |
+| \r     | 回车                              |
+| \f     | 换页                              |
+| \e     | 转移(Escape)                      |
+
+
+- 字符类说明
+
+| 字符类       | 说明                                                   |
+|--------------+--------------------------------------------------------|
+| .            | 任意字符                                               |
+| [abc]        | 包含a,b和c的任何字符(和a或b或c作用相同)                |
+| [^abc]       | 除了a,b和c之外任何字符串(否定)                         |
+| [a-zA-Z]     | 从a到z或从A到Z的任何字符(范围)                         |
+| [abc[hij]    | 任意a,b,c,h,i和j字符(与a或b或c或h或i或j作用相同)(合并) |
+| [a-z&&[hij]] | 任意的h,i或j(交)                                       |
+| \s           | 空白符(空格,tab,换行,换页和回车)                  |
+| \S           | 非空白符([^\s])                                        |
+| \d           | 数组[0-9]                                              |
+| \D           | 非数字[^0-9]                                           |
+| \w           | 词字符[a-zA-Z0-9]                                      |
+| \W           | 非此字符[^\w]                                              |
+
+
+- 边界匹配符
+| 边界匹配符 | 说明             |
+|------------+------------------|
+| ^          | 一行的起始       |
+| \B         | 非词的边界       |
+| $          | 一行的结束       |
+| \G         | 前一个匹配的结束 |
+| \b         | 词的边界       |
+
+
+*** 量词
+1. 量词描述了一个模式吸收输入文本的方式
+   - 贪婪型: 量词总是贪婪的,除非有其他的选项被设置.贪婪型表达式会为所有可能的模式发现尽可能多的匹配.导致此问题的一个典型理由就是嘉定我们的模式技能匹配第一个可能的字符组,如果它是贪婪的,那么它就会继续往下匹配.
+   - 勉强型: 用问号来制定,这个量词匹配满足模式所需的最少字符数,也称作懒惰的,最少匹配的,非贪婪的,不贪婪的.
+   - 占有型: 目前,这种类型的量词只有在Java中才可用.当正则表达式被应用于字符串时,它会产生相当多的状态,以便在匹配失败的时候可以回溯.它们常常可以用于防止正则表达式时空,因此可以使用正则表达式执行起来更有效.
+
+| 贪婪型 | 勉强型  | 占有型  | 如何匹配             |
+|--------+---------+---------+----------------------|
+| X?     | X??     | X?+     | 一个或零个X          |
+| X*     | X*?     | X*+     | 零个或多个X          |
+| X+     | X+?     | X++     | 一个或多个X          |
+| X{n}   | X{n}?   | X{n}+   | 恰好n次X             |
+| X{n,}  | X{n,}?  | X{n,}+  | 至少n次X             |
+| X{n,m} | X{n,m}? | X{n,m}+ | X至少n次,且不超过m次 |
+
+*** Pattern和Matcher
+- Pattern.compile()方法用来编译正则表达式并返回一个Pattern对象.
+- Pattern对象的matcher()方法会生成一个Matcher对象.
+- Matcher的方法,能够判断各种不同配型的匹配是否成功
+  - boolean matches()
+  - boolean lookingAt()
+  - boolean find()
+  - boolean find(int start)
+
+*** 组
+- 组是用括号划分的正则表达式,可以根据组的编号来引用某个组.组号为0表示整个表达式,组号为1表示被一对括号括起的组,一次类推.
+- Matcher对象提供了一系列方法
+  - public int groupCount(): 该匹配器的模式中分组的数目,第0组不包括在内.
+  - public String group(): 返回前一次匹配操作的第0组.
+  - public String group(int i): 返回前一次匹配操作期间指定的组号,如果匹配成功,但是指定的组没有匹配输入字符串的任何部分,则将会返回null.
+
+*** Matcher的相关方法
+- Matcher对象提供了一系列方法
+  - public int groupCount(): 该匹配器的模式中分组的数目,第0组不包括在内.
+  - public String group(): 返回前一次匹配操作的第0组.
+  - public String group(int i): 返回前一次匹配操作期间指定的组号,如果匹配成功,但是指定的组没有匹配输入字符串的任何部分,则将会返回null.
+  - public int start(int group): 返回前一次匹配操作中寻找到的组的起始索引.
+  - public int end(int group): 返回在前一次匹配操作中寻找到的组的最后一个字符索引加1的值
+  - public boolean find(): 可以在输入的任意位置定位正则表达式.
+  - public boolean lookingAt(): 只有在正则表达式与输入的最开始处就开始匹配才会成功, 只要输入的第一部分匹配就会成功.
+  - public boolean matches(): 只有在正则表达式与输入的最开始处就开始匹配才会成功,只有在整个输入都匹配正则表达式时才会成功.
+  - public String[] split(CharSequence input): 将输入字符串断开成字符串对象数组,断开边界由下列正则表达式决定.
+  - public String[] split(CharSequence input, int limit): 将输入字符串断开成字符串对象数组,断开边界由下列正则表达式决定,limit限定将输入分割成字符串的数量.
+  - public replaceFirst(String replacement): 以参数字符串replacement替换掉第一个匹配成功的部分.
+  - public replaceAll(String replacement): 以参数字符串replacement替换掉所有匹配成功的部分.
+  - public appendReplacement(StringBuffer sbuf, String replacement): 执行渐进式的替换,而不是像replaceFirst()和replaceAll()那样只替换第一个匹配或者全部匹配.它允许你调用其他方法来生成或处理replacement,使你能够以编程的方式将目标分割成组.
+  - appendTail(StringBuffer sbuf): 在执行了一次或多次appendReplacement()之后,调用此方法可以将输入字符串余下的部分复制到sbuf中.
+  - reset(CharSequence input)方法: 可以将现有的Matcher对象应用于一个新的字符序列.
+
+*** Pattern标记
+1. Pattern类的compile()方法还有另一个版本,接受标记参数,调整匹配的行为.
+   - Pattern Pattern.compile(String regex, int flag)
+2. flag常量如下
+| 编译标记                     | 效果                                                                                                                                                                                                |
+|------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Pattern.CANON_EQ             | 两个字符当且仅当它们的完全规范分解相匹配时,就认为它们是匹配的.例如:如果我们指定这个标记,表达式a\u030A就会匹配字符串?.在默认的情况下,匹配不考虑规范的等价性.                                         |
+| Pattern.CASE_INSENSITIVE(?i) | 默认情况下,大小写不敏感的匹配只有US-ASCII字符集中的字符才能进行.这个标记运行模式匹配不必考虑大小写(大写或小写).通过指定UNICODE_CASE标记及结合此标记,基于Unicode的大小写不敏感的匹配模式也可以开启了 |
+| Pattern.COMMENTS(?x)         | 在这种模式下,空格符将被忽略掉,并且以#开始直到行末的注释也会被忽略掉.通过嵌入的标记表达式也可以开启Unix的行模式                                                                                      |
+| Pattern.DOTALL(?s)           | 在dotall模式中,表达式"."匹配所有字符,包括行终结符.默认情况下,"."表达式不匹配行终结符                                                                                                                |
+| Pattern.MULTILINE(?m)        | 在多行模式下,表达式^和$分别匹配一行的开始和结束.^还匹配输入字符串的开始,而$还匹配输入字符串的结尾.默认情况下,这些表达式仅匹配输入的完整字符串的开始和结束                                           |
+| Pattern.UNICODE_CASE(?u)     | 当指定这个标记,并且开启CASE_INSENSITIVE时,大小写不敏感的匹配将按照与Unicode标准相一致的方式进行.默认情况下,大小写不敏感的匹配假定只能在US-ASCII字符集中的字符才能进行                               |
+| Pattern.UNIX_LINES(?d)       | 这种模式下,在. ^和$行为中,只识别行终结符\n                                                                                                                                                          |
+
+*** 正则表达式和Java I/O
+#+BEGIN_SRC java
+//: strings/JGrep.java
+package strings;
+
+import net.mindview.util.TextFile;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class JGrep {
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: java JGrep file regex");
+            System.exit(0);
+        }
+        Pattern p = Pattern.compile("\\b[Ssct]\\w+");
+        // Iterate through the lines of the input file:
+        int index = 0;
+        Matcher m = p.matcher("");
+        for (String line : new TextFile(args[0])) {
+            m.reset(line);
+            while (m.find()) {
+                System.out.println(index++ + ": " +
+                        m.group() + ": " + m.start());
+            }
+        }
+    }
+}
+#+END_SRC
+
